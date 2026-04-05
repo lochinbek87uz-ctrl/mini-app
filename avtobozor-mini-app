@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AvtoBozor</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card: #161616;
+    --card2: #1e1e1e;
+    --accent: #e8c84a;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --text-dark: #000;
+    --muted: #888;
+    --border: #2a2a2a;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* AD BANNER */
+  .promo-banner {
+    background: linear-gradient(135deg, #e8c84a, #ff6b35);
+    margin: 10px 12px;
+    min-height: 60px;
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-dark);
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.5s ease, background 0.5s ease;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--card);
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo span { color: var(--accent2); }
+
+  .add-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  .add-btn:active { transform: scale(0.96); opacity: 0.85; }
+
+  /* SEARCH */
+  .search-box {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .search-input {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  .filter-btn {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* FILTER BUTTONS */
+  .filter-actions {
+    display: flex;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  .action-btn {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tab {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .selection-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 10px;
+    padding: 0 16px 12px;
+  }
+
+  .stat-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .stat-chip strong { color: var(--accent); font-size: 13px; }
+
+  /* ADS GRID */
+  .ads-container {
+    padding: 0 12px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .ad-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .ad-card:active { transform: scale(0.98); }
+  .ad-card:hover { border-color: #3a3a3a; }
+
+  .ad-fav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ad-img-wrap {
+    position: relative;
+    height: 120px;
+    background: var(--card2);
+    overflow: hidden;
+  }
+
+  .ad-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .ad-card:hover .ad-img { transform: scale(1.03); }
+
+  .ad-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--accent);
+    color: #000;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .ad-badge.vip {
+    background: var(--accent2);
+    color: #fff;
+  }
+
+  .ad-region {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+
+  .ad-body {
+    padding: 12px 14px;
+  }
+
+  .ad-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .ad-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .ad-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    background: var(--card2);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .ad-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .ad-time {
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  .contact-btn {
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .contact-btn:active { opacity: 0.8; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0 12px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    gap: 3px;
+    transition: color 0.2s;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-icon { font-size: 20px; line-height: 1; }
+
+  /* MODAL / FORM */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px 40px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(60px);
+    transition: transform 0.3s ease;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 18px;
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .form-input, .form-select {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--accent); }
+  .form-select option { background: var(--card2); }
+
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .submit-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+  /* DETAIL VIEW */
+  .detail-view {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .detail-view.open { transform: translateX(0); }
+
+  .detail-header {
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,13,0.9);
+    backdrop-filter: blur(10px);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .back-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .detail-imgs {
+    height: 240px;
+    background: var(--card2);
+    position: relative;
+    overflow: hidden;
+  }
+  .detail-imgs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .detail-body { padding: 16px; }
+
+  .detail-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .detail-name {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 4px 0 12px;
+  }
+
+  .detail-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .spec-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .spec-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .spec-value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+
+  .detail-desc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 30px;
+  }
+
+  .call-btn {
+    flex: 1;
+    background: #25d366;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.15s;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .tg-btn {
+    background: #2aabee;
+  }
+  .share-btn {
+    background: #6c757d; /* A neutral color for share button */
+    flex: 1;
+    background: #2aabee;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; font-weight: 600; }
+
+  /* LOADING */
+  .skeleton {
+    background: linear-gradient(90deg, var(--card) 25%, var(--card2) 50%, var(--card) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: var(--radius);
+    height: 240px;
+    margin-bottom: 10px;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    z-index: 999;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* PHOTO UPLOAD */
+  .photo-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 5px;
+  }
+  .photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(255,0,0,0.8);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 5;
+  }
+  .photo-add-btn {
+    aspect-ratio: 1;
+    background: var(--card2);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- PROMO BANNER -->
+<!-- Agar reklama platformasi ishlatilsa (masalan AdSense), ushbu div ichiga platforma kodini qo'yasiz -->
+<div class="promo-banner" id="promoBanner" onclick="handlePromoClick()">
+  <span id="promoText">🚀 REKLAMA BANNERI: AVTOBOZORDA ENG ZO'R NARXLAR!</span>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Avto<span>Bozor</span></div>
+    <button class="add-btn" onclick="openForm()">+ E'lon berish</button>
+  </div>
+  <div class="search-box">
+    <input class="search-input" type="text" placeholder="🔍  Model, viloyat, narx..." oninput="filterAds(this.value)" id="searchInput">
+    <button class="filter-btn" onclick="toggleAdvancedFilters()">⚙️</button>
+  </div>
+</div>
+
+<!-- ADVANCED FILTERS -->
+<div id="advancedFilters" style="display:none; padding:10px 16px; background:var(--card); border-bottom:1px solid var(--border);">
+  <div class="form-row">
+    <div class="form-group" style="margin-bottom:5px">
+      <label class="form-label">Min Narx ($)</label>
+      <input class="form-input" type="number" id="filterPriceMin" placeholder="0" oninput="applyFilters()">
+    </div>
+    <div class="form-group" style="margin-bottom:5px">
+      <label class="form-label">Max Narx ($)</label>
+      <input class="form-input" type="number" id="filterPriceMax" placeholder="999999" oninput="applyFilters()">
+    </div>
+  </div>
+  <div id="priceConversion" style="font-size:11px; color:var(--accent); font-weight:700; margin-bottom:5px; min-height:15px;"></div>
+</div>
+
+<!-- FILTER ACTIONS -->
+<div class="filter-actions">
+  <button class="action-btn" onclick="openSelector('model')">🚘 Model</button>
+  <button class="action-btn" onclick="openSelector('region')">📍 Viloyat</button>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-chip">🔥 <strong>Bugun</strong> yangi</div>
+</div>
+
+<!-- ADS LIST -->
+<div class="ads-container" id="adsContainer">
+  <div class="skeleton"></div>
+  <div class="skeleton" style="height:200px"></div>
+  <div class="skeleton" style="height:220px"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="setNav(this, 'home')">
+    <span class="nav-icon">🏠</span>
+    Bosh sahifa
+  </div>
+  <div class="nav-item" onclick="setNav(this, 'favorites')">
+    <span class="nav-icon">❤️</span>
+    Sevimli
+  </div>
+  <div class="nav-item" onclick="setNav(this, 'myads')">
+    <span class="nav-icon">📋</span>
+    Mening
+  </div>
+  <div class="nav-item" onclick="setNav(this, 'profile')">
+    <span class="nav-icon">👤</span>
+    Profil
+  </div>
+</div>
+
+<!-- ADD FORM MODAL -->
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Yangi E'lon</div>
+
+    <div class="form-group">
+      <label class="form-label">Mashina modeli</label>
+      <select class="form-select" id="f_model" onchange="checkModel(this.value)">
+        <option value="">Tanlang...</option>
+        <option value="Damas">🚐 Damas</option>
+        <option value="Labo">🚚 Labo</option>
+        <option value="Matiz">🚕 Matiz</option>
+        <option value="Spark">🚗 Spark</option>
+        <option value="Cobalt">⚪️ Cobalt</option>
+        <option value="Nexia">🚘 Nexia 1, 2, 3</option>
+        <option value="Onix">💎 Onix</option>
+        <option value="Gentra">🕶 Gentra / Lacetti</option>
+        <option value="Captiva">🏔 Captiva</option>
+        <option value="Malibu">🏁 Malibu</option>
+        <option value="Monza">🚀 Monza</option>
+        <option value="Tracker">🛰 Tracker</option>
+        <option value="Orlando">👨‍👩‍👧‍👦 Orlando</option>
+        <option value="Equinox">🌪 Equinox</option>
+        <option value="Trailblazer">🚔 Trailblazer</option>
+        <option value="Tahoe">👑 Tahoe</option>
+        <option value="Tico">🐣 Tico</option>
+        <option value="Fura">🚛 Fura va yuk</option>
+        <option value="Maxsus">🚜 Maxsus texnika</option>
+        <option value="Inomarka">🏎 Inomarka</option>
+        <option value="Boshqa">➕ Boshqa (Modelni qo'lda kiritish)</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="customModelGroup" style="display:none">
+      <label class="form-label">Modelni kiriting (Boshqa)</label>
+      <input class="form-input" type="text" id="f_custom_model" placeholder="Model nomini yozing...">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Rasmlar (1-6 ta)</label>
+      <div class="photo-upload-grid" id="photoGrid">
+        <div class="photo-add-btn" onclick="document.getElementById('photoInput').click()"><span>+</span></div>
+      </div>
+      <input type="file" id="photoInput" multiple accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Yil</label>
+        <input class="form-input" type="number" id="f_year" placeholder="2020" min="1990" max="2025">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rang</label>
+        <input class="form-input" type="text" id="f_color" placeholder="Oq">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Narx ($)</label>
+      <input class="form-input" type="number" id="f_price" placeholder="12000">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Yoqilg'i turi</label>
+      <select class="form-select" id="f_fuel_type">
+        <option value="">Tanlang...</option>
+        <option value="Benzin">⛽️ Benzin</option>
+        <option value="Dizel">🛢 Dizel</option>
+        <option value="Gaz">💨 Gaz</option>
+        <option value="Benzin+Gaz">⛽️💨 Benzin+Gaz</option>
+        <option value="Elektr">⚡️ Elektr</option>
+        <option value="Gibrid">♻️ Gibrid</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Viloyat</label>
+      <select class="form-select" id="f_region">
+        <option value="">Tanlang...</option>
+        <option>Toshkent</option><option>Andijon</option><option>Farg'ona</option>
+        <option>Namangan</option><option>Samarqand</option><option>Buxoro</option>
+        <option>Navoiy</option><option>Qashqadaryo</option><option>Surxondaryo</option>
+        <option>Jizzax</option><option>Sirdaryo</option><option>Xorazm</option>
+        <option>Qoraqalpog'iston</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Yurgan masofasi (km)</label>
+      <input class="form-input" type="number" id="f_mileage" placeholder="85000">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Qo'shimcha ma'lumot</label>
+      <input class="form-input" type="text" id="f_desc" placeholder="Holati yaxshi, garaj...">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Telefon raqam</label>
+      <input class="form-input" type="tel" id="f_phone" placeholder="+998 90 123 45 67">
+    </div>
+
+    <button class="submit-btn" onclick="submitAd()">📤 E'lonni yuborish</button>
+    <div style="height:10px"></div>
+    <button class="submit-btn" style="background:var(--card2);color:var(--muted);margin-top:0" onclick="closeForm()">Bekor qilish</button>
+  </div>
+</div>
+
+<!-- SELECTION MODAL -->
+<div class="modal-overlay" id="selectorModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="selectorTitle">Tanlang</div>
+    <div class="selection-list" id="selectorList"></div>
+    <button class="submit-btn" style="background:var(--card2);color:var(--muted);margin-top:15px" onclick="closeSelector()">Yopish</button>
+  </div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div class="detail-view" id="detailView">
+  <div class="detail-header">
+    <div class="back-btn" onclick="closeDetail()">←</div>
+    <span id="detail-header-title" style="font-weight:800;font-size:16px"></span>
+  </div>
+  <div class="detail-imgs">
+    <img id="detail-img" src="" alt="">
+  </div>
+  <div class="detail-body">
+    <div class="detail-price" id="detail-price"></div>
+    <div class="detail-name" id="detail-name"></div>
+    <div class="detail-specs" id="detail-specs"></div>
+    <div class="detail-desc" id="detail-desc"></div>
+    <div class="detail-actions">
+      <button class="call-btn" id="detail-call">📞 Qo'ng'iroq</button>
+      <button class="tg-btn" id="detail-tg">✈️ Telegram</button>
+      <button class="share-btn" id="detail-share">🔗 Ulashish</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Initialize Telegram Web App
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  tg.setHeaderColor('#161616');
+  tg.setBackgroundColor('#0d0d0d');
+}
+
+// DEMO DATA
+const CAR_IMAGES = [
+  'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&q=80',
+  'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&q=80',
+  'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&q=80',
+  'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80',
+  'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&q=80',
+  'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&q=80',
+];
+
+let allAds = [
+  { id:1, model:'Cobalt Avtomat', year:2022, price:13500, region:'Toshkent', mileage:42000, color:'Oq', fuel_type:'Benzin+Gaz', phone:'+998901234567', desc:'Holati a\'lo. Garajda saqlangan. Hamma hujjatlar joyida.', img:CAR_IMAGES[0], vip:true, tag:'chevrolet', timestamp: Date.now() - 2*3600*1000 },
+  { id:2, model:'BYD Song Plus DMI', year:2024, price:29000, region:'Samarqand', mileage:8000, color:'Qora', fuel_type:'Elektr', phone:'+998931234567', desc:'Yangi, aksessuarlar bor. Rasm ko\'p bor.', img:CAR_IMAGES[1], vip:false, tag:'chinese', timestamp: Date.now() - 5*3600*1000 },
+  { id:3, model:'Nexia 3 Avtomat', year:2021, price:11800, region:'Andijon', mileage:61000, color:'Kumush', fuel_type:'Benzin', phone:'+998971234567', desc:'Texnik ko\'rik o\'tilgan. Muammosiz.', img:CAR_IMAGES[2], vip:false, tag:'chevrolet', timestamp: Date.now() - 24*3600*1000 },
+  { id:4, model:'Kia K5', year:2023, price:38000, region:'Farg\'ona', mileage:12000, color:'Ko\'k', fuel_type:'Benzin', phone:'+998901112233', desc:'Full komplektatsiya. Panorama lyuk bor.', img:CAR_IMAGES[3], vip:true, tag:'foreign', timestamp: Date.now() - 3*3600*1000 },
+  { id:5, model:'Haval Jolion', year:2023, price:27500, region:'Toshkent', mileage:22000, color:'Qizil', fuel_type:'Benzin', phone:'+998951234567', desc:'Premium versiya. Kamera, krujok bor.', img:CAR_IMAGES[4], vip:false, tag:'chinese', timestamp: Date.now() - 6*3600*1000 },
+  { id:6, model:'Lada Vesta', year:2020, price:9200, region:'Namangan', mileage:75000, color:'Oq', fuel_type:'Benzin+Gaz', phone:'+998881234567', desc:'Yaxshi holat, yangi rezinalar.', img:CAR_IMAGES[5], vip:false, tag:'vaz', timestamp: Date.now() - 48*3600*1000 },
+  { id:7, model:'Gentra Avtomat', year:2022, price:12900, region:'Buxoro', mileage:38000, color:'Qora', fuel_type:'Benzin', phone:'+998901234568', desc:'Elegant Plus. Hamma narsa ishlaydi.', img:CAR_IMAGES[0], vip:false, tag:'chevrolet', timestamp: Date.now() - 1*3600*1000 },
+  { id:8, model:'Toyota Camry', year:2022, price:47000, region:'Toshkent', mileage:25000, color:'Kumush', fuel_type:'Benzin', phone:'+998991234567', desc:'Luxury komplekt. Forom qilingan.', img:CAR_IMAGES[1], vip:true, tag:'foreign', timestamp: Date.now() - 4*3600*1000 },
+];
+
+let filteredAds = [...allAds];
+let currentTab = 'all';
+let currentPage = 'home';
+let searchQuery = '';
+let selectedModel = '';
+let selectedRegion = '';
+let favorites = JSON.parse(localStorage.getItem('avto_favs') || '[]');
+let selectedPhotos = [];
+
+// REKLAMA BANNERLARI RO'YXATI
+const PROMO_ADS = [
+  { text: "🚀 REKLAMA: AVTOBOZORDA ENG ZO'R NARXLAR!", link: "https://t.me/AvtoBozori_Admini", bg: "linear-gradient(135deg, #e8c84a, #ff6b35)" },
+  { text: "🔥 VIP E'LONLAR: Mashinangizni 1 kunda soting!", link: "https://t.me/AvtoBozori_Admini", bg: "linear-gradient(135deg, #ff6b35, #e05c3a)" },
+  { text: "💎 BIZNES UCHUN: Reklama berish @AvtoBozori_Admini", link: "https://t.me/AvtoBozori_Admini", bg: "linear-gradient(135deg, #4caf7d, #2aabee)" }
+  // Agar rasm qo'ymoqchi bo'lsangiz, bg: "url('rasm_linki') center/cover" ko'rinishida yozishingiz mumkin
+];
+let currentPromoIdx = 0;
+
+function handlePromoClick() {
+  const ad = PROMO_ADS[currentPromoIdx];
+  if (tg) tg.openLink(ad.link);
+  else window.open(ad.link, '_blank');
+}
+
+function startPromoRotation() {
+  const banner = document.getElementById('promoBanner');
+  const pText = document.getElementById('promoText');
+  setInterval(() => {
+    currentPromoIdx = (currentPromoIdx + 1) % PROMO_ADS.length;
+    banner.style.opacity = '0';
+    setTimeout(() => {
+      pText.innerText = PROMO_ADS[currentPromoIdx].text;
+      banner.style.background = PROMO_ADS[currentPromoIdx].bg;
+      banner.style.opacity = '1';
+    }, 500);
+  }, 7000); // Har 7 soniyada almashadi
+}
+
+function formatTimeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 3600*1000) return `${Math.floor(diff/60000)} min oldin`;
+  if (diff < 24*3600*1000) return `${Math.floor(diff/(3600*1000))} soat oldin`;
+  return `${Math.floor(diff/(24*3600*1000))} kun oldin`;
+}
+const REGIONS = ["Toshkent", "Andijon", "Farg'ona", "Namangan", "Samarqand", "Buxoro", "Navoiy", "Qashqadaryo", "Surxondaryo", "Jizzax", "Sirdaryo", "Xorazm", "Qoraqalpog'iston"];
+const MODELS = [
+  { n: "🚐 Damas", v: "Damas" },
+  { n: "🚚 Labo", v: "Labo" },
+  { n: "🚕 Matiz", v: "Matiz" },
+  { n: "🚗 Spark", v: "Spark" },
+  { n: "⚪️ Cobalt", v: "Cobalt" },
+  { n: "🚘 Nexia 1,2,3", v: "Nexia" },
+  { n: "💎 Onix", v: "Onix" },
+  { n: "🕶 Gentra/Lacetti", v: "Gentra" },
+  { n: "🏔 Captiva", v: "Captiva" },
+  { n: "🏁 Malibu", v: "Malibu" },
+  { n: "🚀 Monza", v: "Monza" },
+  { n: "🛰 Tracker", v: "Tracker" },
+  { n: "👨‍👩‍👧‍👦 Orlando", v: "Orlando" },
+  { n: "🌪 Equinox", v: "Equinox" },
+  { n: "🚔 Trailblazer", v: "Trailblazer" },
+  { n: "👑 Tahoe", v: "Tahoe" },
+  { n: "🐣 Tico", v: "Tico" },
+  { n: "🚛 Fura va yuk", v: "Fura" },
+  { n: "🚜 Maxsus", v: "Maxsus" },
+  { n: "🏎 Inomarka", v: "Inomarka" },
+];
+
+function renderAds(ads) {
+  const container = document.getElementById('adsContainer');
+  if (ads.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="emoji">🚗</div><p>E'lonlar topilmadi</p></div>`;
+    return;
+  }
+
+  // VIP Mantiqi: Eng yangi VIPlar yuqorida (3-4 ta), keyin har 12 ta oddiy e'londa 1 ta VIP
+  const vips = ads.filter(a => a.vip).sort((a,b) => b.id - a.id);
+  const regulars = ads.filter(a => !a.vip).sort((a,b) => b.id - a.id);
+  
+  let finalDisplayList = [];
+  
+  // Dastlabki 4 ta VIP
+  finalDisplayList = vips.slice(0, 4);
+  let remainingVips = vips.slice(4);
+  
+  regulars.forEach((ad, index) => {
+    finalDisplayList.push(ad);
+    // Har 12 ta oddiy e'londan keyin bitta VIP (agar qolgan bo'lsa)
+    if ((index + 1) % 12 === 0 && remainingVips.length > 0) {
+      finalDisplayList.push(remainingVips.shift());
+    }
+  });
+
+  container.innerHTML = finalDisplayList.map((ad, i) => {
+    const isFav = favorites.includes(ad.id);
+    return `
+    <div class="ad-card" onclick="openDetail(${ad.id})">
+      <div class="ad-img-wrap">
+        <img class="ad-img" src="${ad.img}" alt="${ad.model}" loading="lazy">
+        <div class="ad-fav" onclick="event.stopPropagation(); toggleFav(${ad.id})">
+          ${isFav ? '❤️' : '🤍'}
+        </div>
+        ${ad.vip ? '<div class="ad-badge vip">VIP</div>' : ''}
+        <div class="ad-region">📍 ${ad.region}</div>
+      </div>
+      <div class="ad-body">
+        <div class="ad-title">${ad.model}</div>
+        <div class="ad-price">$${ad.price.toLocaleString()}</div>
+        <div class="ad-meta">
+          <span class="meta-chip">📅 ${ad.year}</span>
+          <span class="meta-chip">🛣 ${(ad.mileage/1000).toFixed(0)}k</span>
+          <span class="meta-chip">🎨 ${ad.color}</span>
+        </div>
+      </div> 
+      <div class="ad-footer">
+        <span class="ad-time">🕐 ${ad.time}</span>
+        <button class="contact-btn" onclick="event.stopPropagation(); contactUser(${ad.id})">Bog'lanish</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
+function applyFilters() {
+  let ads = [...allAds];
+  
+  const minP = parseFloat(document.getElementById('filterPriceMin').value) || 0;
+  const maxP = parseFloat(document.getElementById('filterPriceMax').value) || Infinity;
+  const rate = 12800; // 1$ = 12800 UZS
+  
+  const convDiv = document.getElementById('priceConversion');
+  if (convDiv && (minP > 0 || maxP < Infinity)) {
+      let text = "";
+      if (minP > 0) text += `Min: ${(minP * rate).toLocaleString()} so'm `;
+      if (maxP < Infinity) text += `| Max: ${(maxP * rate).toLocaleString()} so'm`;
+      convDiv.innerText = text;
+  } else if (convDiv) {
+      convDiv.innerText = "";
+  }
+
+  ads = ads.filter(a => a.price >= minP && a.price <= maxP);
+
+  if (selectedModel) {
+    ads = ads.filter(a => a.model.toLowerCase().includes(selectedModel.toLowerCase()));
+  }
+  
+  if (selectedRegion) {
+    ads = ads.filter(a => a.region === selectedRegion);
+  }
+
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    ads = ads.filter(a =>
+      a.model.toLowerCase().includes(q) ||
+      a.region.toLowerCase().includes(q) ||
+      String(a.price).includes(q) || 
+      String(a.year).includes(q)
+    );
+  }
+  filteredAds = ads;
+  renderAds(filteredAds);
+}
+
+function filterAds(val) { searchQuery = val; applyFilters(); }
+
+function openSelector(type) {
+  const modal = document.getElementById('selectorModal');
+  const title = document.getElementById('selectorTitle');
+  const list = document.getElementById('selectorList');
+  
+  list.innerHTML = '';
+  if (type === 'model') {
+    title.innerText = 'Model tanlang';
+    MODELS.forEach(m => {
+      list.innerHTML += `<div class="tab ${selectedModel === m.v ? 'active' : ''}" onclick="selectItem('model', '${m.v}')">${m.n}</div>`;
+    });
+  } else {
+    title.innerText = 'Viloyat tanlang';
+    REGIONS.forEach(r => {
+      list.innerHTML += `<div class="tab ${selectedRegion === r ? 'active' : ''}" onclick="selectItem('region', '${r}')">${r}</div>`;
+    });
+  }
+  modal.classList.add('open');
+}
+
+function closeSelector() {
+  document.getElementById('selectorModal').classList.remove('open');
+}
+
+function selectItem(type, value) {
+  if (type === 'model') selectedModel = (selectedModel === value) ? '' : value;
+  if (type === 'region') selectedRegion = (selectedRegion === value) ? '' : value;
+  
+  closeSelector();
+  showToast(`Filtr: ${value || 'Barchasi'}`);
+  applyFilters();
+}
+
+function handlePhotoSelect(event) {
+  const files = Array.from(event.target.files);
+  if (selectedPhotos.length + files.length > 6) {
+    showToast("⚠️ Maksimal 6 ta rasm yuklash mumkin");
+    return;
+  }
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedPhotos.push(e.target.result);
+      renderPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  const addBtn = `<div class="photo-add-btn" onclick="document.getElementById('photoInput').click()"><span>+</span></div>`;
+  let html = selectedPhotos.map((src, idx) => `
+    <div class="photo-item">
+      <img src="${src}">
+      <div class="photo-remove" onclick="removePhoto(${idx})">×</div>
+    </div>
+  `).join('');
+  if (selectedPhotos.length < 6) html += addBtn;
+  grid.innerHTML = html;
+}
+
+function removePhoto(idx) {
+  selectedPhotos.splice(idx, 1);
+  renderPhotoGrid();
+}
+
+function toggleFav(id) {
+  const index = favorites.indexOf(id);
+  if (index > -1) {
+    favorites.splice(index, 1);
+    showToast('💔 Sevimlilardan olib tashlandi');
+  } else {
+    favorites.push(id);
+    showToast('❤️ Sevimlilarga qo\'shildi');
+  }
+  localStorage.setItem('avto_favs', JSON.stringify(favorites));
+  // Re-render current page to update heart icons
+  if (currentPage === 'favorites') {
+    setNav(document.querySelector('.nav-item.active'), 'favorites');
+  } else {
+    applyFilters();
+  }
+}
+
+function openDetail(id) {
+  const ad = allAds.find(a => a.id === id);
+  if (!ad) return;
+  document.getElementById('detail-header-title').textContent = ad.model; // Changed from ad.model + ' · ' + ad.year to just ad.model
+  document.getElementById('detail-img').src = ad.img;
+  document.getElementById('detail-price').textContent = '$' + ad.price.toLocaleString();
+  document.getElementById('detail-name').textContent = ad.model + ' · ' + ad.year;
+  document.getElementById('detail-specs').innerHTML = `
+    <div class="spec-item"><div class="spec-label">Viloyat</div><div class="spec-value">📍 ${ad.region}</div></div>
+    <div class="spec-item"><div class="spec-label">Yil</div><div class="spec-value">📅 ${ad.year}</div></div>
+    <div class="spec-item"><div class="spec-label">Yurgan</div><div class="spec-value">🛣 ${ad.mileage.toLocaleString()} km</div></div>
+    <div class="spec-item"><div class="spec-label">Yoqilg'i</div><div class="spec-value">⛽️ ${ad.fuel_type}</div></div>
+    <div class="spec-item"><div class="spec-label">Rang</div><div class="spec-value">🎨 ${ad.color}</div></div>
+  `;
+  document.getElementById('detail-desc').textContent = ad.desc;
+  document.getElementById('detail-call').onclick = () => {
+    if (tg) tg.openLink('tel:' + ad.phone);
+    else window.open('tel:' + ad.phone);
+    showToast('📞 Qo\'ng\'iroq qilinmoqda...');
+  };
+  document.getElementById('detail-tg').onclick = () => contactUser(id);
+  document.getElementById('detail-share').onclick = () => {
+    if (tg) tg.shareUrl(window.location.href + '?ad=' + ad.id, `AvtoBozor: ${ad.model} ${ad.year} - ${ad.price}$`);
+    else showToast('🔗 Havola nusxalandi!'); // Fallback for web
+    // For web, you might want to use navigator.share or copy to clipboard
+  };
+  document.getElementById('detailView').classList.add('open');
+  if (tg) tg.BackButton.show();
+}
+
+
+function checkModel(val) {
+  const customGroup = document.getElementById('customModelGroup');
+  if (val === 'Boshqa' || val === 'Elektromobil') {
+    customGroup.style.display = 'block';
+  } else {
+    customGroup.style.display = 'none';
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detailView').classList.remove('open');
+  if (tg) tg.BackButton.hide();
+}
+
+function openForm() {
+  document.getElementById('formModal').classList.add('open');
+}
+
+function closeForm() {
+  document.getElementById('formModal').classList.remove('open');
+}
+
+function contactUser(id) {
+  const ad = allAds.find(a => a.id === id);
+  if (!ad) return;
+  if (tg) {
+    tg.sendData(JSON.stringify({ action: 'contact', adId: id, phone: ad.phone }));
+  } else {
+    showToast('📞 ' + ad.phone);
+  }
+}
+
+function submitAd() {
+  let model = document.getElementById('f_model').value;
+  const customModel = document.getElementById('f_custom_model').value;
+  const year = document.getElementById('f_year').value;
+  const price = document.getElementById('f_price').value;
+  const region = document.getElementById('f_region').value;
+  const mileage = document.getElementById('f_mileage').value;
+  const color = document.getElementById('f_color').value;
+  const desc = document.getElementById('f_desc').value;
+  const fuel_type = document.getElementById('f_fuel_type').value; // Get fuel type
+  const phone = document.getElementById('f_phone').value;
+
+  if ((model === 'Boshqa' || model === 'Elektromobil') && customModel) model = customModel;
+
+  if (!model || !year || !price || !region || !fuel_type || !phone) { // Added fuel_type to validation
+    showToast('⚠️ Barcha maydonlarni to\'ldiring');
+    return;
+  }
+  
+  const newAd = {
+    id: allAds.length + 1,
+    model, year: parseInt(year), price: parseInt(price),
+    region, mileage: parseInt(mileage)||0, color: color||'—',
+    phone, desc: desc||'—',
+    img: selectedPhotos.length > 0 ? selectedPhotos[0] : CAR_IMAGES[Math.floor(Math.random() * CAR_IMAGES.length)],
+    images: selectedPhotos,
+    vip: false, tag: 'chevrolet', timestamp: Date.now(), fuel_type // Added fuel_type and timestamp
+  };
+
+  allAds.unshift(newAd);
+
+  if (tg) {
+    tg.sendData(JSON.stringify({ action: 'new_ad', ad: newAd }));
+  }
+
+  closeForm();
+  applyFilters();
+  showToast('✅ E\'lon yuborildi! Admin tasdiqlaydi.');
+
+  // Clear form
+  ['f_model','f_custom_model','f_year','f_price','f_region','f_mileage','f_color','f_desc','f_fuel_type','f_phone'].forEach(id => { // Added f_fuel_type
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('customModelGroup').style.display = 'none';
+  selectedPhotos = [];
+  renderPhotoGrid();
+}
+
+function setNav(el, page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  
+  if (page === 'myads') {
+    const mine = allAds.filter(a => a.timestamp > Date.now() - 60000); // Filter ads submitted in the last minute as "mine"
+    renderAds(mine.length ? mine : []);
+    if (!mine.length) showToast('📋 Sizning e\'lonlaringiz yo\'q');
+  } else if (page === 'favorites') {
+    const favs = allAds.filter(a => favorites.includes(a.id));
+    renderAds(favs);
+    if (!favs.length) showToast('❤️ Sevimlilar bo\'sh');
+  } else if (page === 'profile') {
+    showToast(tg?.initDataUnsafe?.user?.first_name ? `👤 ${tg.initDataUnsafe.user.first_name}` : '👤 Profil');
+  } else {
+    currentPage = 'home';
+    applyFilters();
+  }
+}
+
+function toggleAdvancedFilters() {
+  const adv = document.getElementById('advancedFilters');
+  adv.style.display = adv.style.display === 'none' ? 'block' : 'none';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Telegram back button
+if (tg) {
+  tg.BackButton.onClick(() => {
+    if (document.getElementById('detailView').classList.contains('open')) {
+      closeDetail();
+    } else if (document.getElementById('formModal').classList.contains('open')) {
+      closeForm();
+    }
+  });
+}
+
+// Close modal on overlay click
+document.getElementById('formModal').addEventListener('click', function(e) {
+  if (e.target === this) closeForm();
+});
+
+// Init
+setTimeout(() => {
+  renderAds(allAds);
+  startPromoRotation();
+  // Check for ad ID in URL for deep linking
+  const urlParams = new URLSearchParams(window.location.search);
+  const adId = urlParams.get('ad');
+  if (adId) openDetail(parseInt(adId));
+}, 800);
+</script>
+</body>
+</html>
